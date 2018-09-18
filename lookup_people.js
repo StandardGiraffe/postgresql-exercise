@@ -10,16 +10,27 @@ const client = new pg.Client({
   ssl: settings.ssl
 });
 
-client.connect((err) => {
+// Take commandline arguments
+const firstName = process.argv[2];
+const lastName = process.argv[3];
+
+client.connect()
+
+console.log("Searching database for", firstName, lastName, "...");
+
+  // Make your query here.
+client.query(`
+  SELECT * FROM famous_people
+  WHERE $1 ILIKE first_name
+  `, [firstName], (err, res) => {
   if (err) {
-    return console.error("Connection Error", err);
+    return "Querying Error: ", err;
   }
 
-  console.log("You've connected!");
-  // Make your query here.
+  console.log(res.rows);
+});
 
-
+  // console.log(res.rows[0]);
 
 client.end();
 console.log("And now you've been disconnected.");
-});
