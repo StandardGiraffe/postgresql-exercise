@@ -11,18 +11,18 @@ const client = new pg.Client({
 });
 
 // Take commandline arguments
-const firstName = process.argv[2];
-const lastName = process.argv[3];
+const name = process.argv[2];
 
 client.connect()
 
-console.log("Searching database for", firstName, lastName, "...");
+console.log("Searching database for", name, "...");
 
   // Make your query here.
 client.query(`
   SELECT * FROM famous_people
   WHERE $1 ILIKE first_name
-  `, [firstName], (err, res) => {
+    OR $1 ILIKE last_name
+  `, [name], (err, res) => {
   if (err) {
     return "Querying Error: ", err;
   }
@@ -30,7 +30,5 @@ client.query(`
   console.log(res.rows);
 });
 
-  // console.log(res.rows[0]);
-
-client.end();
-console.log("And now you've been disconnected.");
+// console.log("And now you've been disconnected.");
+// client.end();
