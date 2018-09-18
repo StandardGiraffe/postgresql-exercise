@@ -13,6 +13,7 @@ const client = new pg.Client({
 // Take commandline arguments
 const name = process.argv[2];
 
+
 client.connect()
 
 console.log("Searching database for", name, "...");
@@ -21,14 +22,24 @@ console.log("Searching database for", name, "...");
 client.query(`
   SELECT * FROM famous_people
   WHERE $1 ILIKE first_name
-    OR $1 ILIKE last_name
+     OR $1 ILIKE last_name
   `, [name], (err, res) => {
   if (err) {
     return "Querying Error: ", err;
   }
 
-  console.log(res.rows);
+  // Prints an enumerated list of hits.
+  const printResults = function (array) {
+    let index = 1;
+    array.forEach((i) => {
+      console.log(`- ${index}: ${i.first_name} ${i.last_name}, born ${i.birthdate.toLocaleString().slice(0, -9)}.`);
+      index++;
+    })
+  }
+
+  console.log(`Found ${res.rows.length} result(s).\n`);
+  printResults(res.rows);
+
+  client.end();
 });
 
-// console.log("And now you've been disconnected.");
-// client.end();
